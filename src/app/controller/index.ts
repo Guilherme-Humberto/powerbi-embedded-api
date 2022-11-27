@@ -6,10 +6,19 @@ import {
   IEmbeddedBody,
   IRlsIdentities,
 } from "@interface/index";
+import {
+  validateCredentialsAuthToken,
+  validateCredentialsEmbeddedToken,
+  validateIdentitiesEmbeddedToken,
+} from "@validation/index";
 
 class PowerBIController {
   async healthCheck(_request: Request, response: Response) {
-    return response.status(200).json({ ok: "Application is running" });
+    try {
+      return response.status(200).json({ ok: "Application is running" });
+    } catch ({ message }) {
+      return response.status(400).json({ message });
+    }
   }
 
   async getAuthToken(request: Request, response: Response) {
@@ -17,10 +26,12 @@ class PowerBIController {
       const credentialsBody: IGenerateAuthToken = request.body;
       const azureAppSecret = String(request.headers.azure_app_secret);
 
+      validateCredentialsAuthToken({ ...credentialsBody, azureAppSecret });
+
       const result = GenerateAuthToken.execute(credentialsBody, azureAppSecret);
       return response.status(200).json(result);
-    } catch (error) {
-      return response.status(400).json({ error });
+    } catch ({ message }) {
+      return response.status(400).json({ message });
     }
   }
 
@@ -29,13 +40,17 @@ class PowerBIController {
       const credentialsBody: IEmbeddedBody = request.body;
       const identitiesBody: IRlsIdentities = request.body;
 
+      validateCredentialsEmbeddedToken(credentialsBody);
+      validateIdentitiesEmbeddedToken(identitiesBody);
+
       const result = GenerateEmbeddedToken.execute(
         credentialsBody,
         identitiesBody
       );
+
       return response.status(200).json(result);
-    } catch (error) {
-      return response.status(400).json({ error });
+    } catch ({ message }) {
+      return response.status(400).json({ message });
     }
   }
 }

@@ -25,7 +25,8 @@
       "@config/*": ["./config/*"],
       "@app/*": ["./app/*"],
       "@interface/*": ["./interface/*"],
-      "@routes/*": ["./routes/*"]
+      "@routes/*": ["./routes/*"],
+      "@validation/*": ["./validation/*"],
     }
   },
   "exclude": ["./node_modules"]
